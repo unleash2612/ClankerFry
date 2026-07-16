@@ -1134,13 +1134,41 @@ export async function registerTemporaryChannel(client, guildId, channelId, owner
         config.temporaryChannels[channelId] = {
             ownerId,
             triggerChannelId,
-            createdAt: Date.now()
+            createdAt: Date.now(),
+            locked: false,
+            allowedUsers: []
         };
         
         return await saveJoinToCreateConfig(client, guildId, config);
     } catch (error) {
         logger.error(`Error registering temporary channel for guild ${guildId}:`, error);
         return false;
+    }
+}
+
+/**
+ * Applies a partial update to a temporary channel's stored info
+ * (e.g. locked state, allowedUsers list). Returns the updated record,
+ * or null if the channel isn't a registered temporary channel.
+ */
+export async function updateTemporaryChannelInfo(client, guildId, channelId, updates) {
+    try {
+        const config = await getJoinToCreateConfig(client, guildId);
+
+        if (!config.temporaryChannels[channelId]) {
+            return null;
+        }
+
+        config.temporaryChannels[channelId] = {
+            ...config.temporaryChannels[channelId],
+            ...updates
+        };
+
+        await saveJoinToCreateConfig(client, guildId, config);
+        return config.temporaryChannels[channelId];
+    } catch (error) {
+        logger.error(`Error updating temporary channel info for guild ${guildId}:`, error);
+        return null;
     }
 }
 
