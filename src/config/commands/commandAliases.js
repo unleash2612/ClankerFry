@@ -102,6 +102,9 @@ export const commandAliases = {
     'jtc': 'jointocreate',
     'jointocreate': 'jointocreate',
 
+    'vc': 'voice',
+    'voice': 'voice',
+
     'np': 'nowplaying',
     'now': 'nowplaying',
 };
